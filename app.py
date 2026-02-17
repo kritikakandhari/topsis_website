@@ -14,9 +14,11 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 from PIL import Image
 import pandas as pd
 import numpy as np
+import concurrent.futures
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+application = app # Alias for Vercel/WSGI
 
 # --- Configuration ---
 # You need to fill these in to actually send email
@@ -209,7 +211,7 @@ def index():
         image_data = [] # [Width, Height, Size]
         valid_images = [] # (content)
         
-        import concurrent.futures
+
         
         def process_url(url):
             return download_and_analyze(url)
@@ -273,8 +275,20 @@ def payment():
     tier = request.args.get('tier')
     filename = request.args.get('filename')
     email = request.args.get('email')
-    amount = request.args.get('amount', 0)
-    return render_template('payment.html', tier=tier, filename=filename, email=email, amount=float(amount), upi_id=RECEIVER_UPI_ID)
+    amount_raw = request.args.get('amount', '0')
+    try:
+        amount = float(amount_raw)
+    except:
+        amount = 0.0
+    return render_template('payment.html', tier=tier, filename=filename, email=email, amount=amount, upi_id=RECEIVER_UPI_ID)
+
+@app.errorhandler(500)
+def internal_error(error):
+    return f"500 Error: {error}", 500
+
+@app.errorhandler(404)
+def not_found(error):
+    return f"404 Error: {error}", 404
 
 @app.route('/send_email', methods=['POST'])
 def send_email_route():
