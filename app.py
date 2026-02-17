@@ -22,6 +22,7 @@ app.secret_key = 'supersecretkey'
 # You need to fill these in to actually send email
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "kkandhari_be23@thapar.edu")
 SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "rnqw okhn khvg gwiq")
+RECEIVER_UPI_ID = os.environ.get("UPI_ID", "kkandhari_be23@thapar.edu") # Default to email, user should update in Vercel
 
 
 # --- Helper Functions ---
@@ -186,7 +187,13 @@ def index():
             
         # Determine tier based on count
         # If > 50, it's paid. Else free.
-        tier = 'paid' if image_count > 50 else 'free'
+        # Cost: 1/2 rupee per image ABOVE 50.
+        if image_count > 50:
+            tier = 'paid'
+            amount = (image_count - 50) * 0.5
+        else:
+            tier = 'free'
+            amount = 0
         
         # Limit for scraping (scrape a bit more to have variety for Topsis)
         scrape_limit = image_count + 10 
@@ -257,7 +264,7 @@ def index():
         with open(zip_path, "wb") as f:
             f.write(zip_buffer.getvalue())
             
-        return redirect(url_for('payment', tier=tier, filename=zip_filename, email=email))
+        return redirect(url_for('payment', tier=tier, filename=zip_filename, email=email, amount=amount))
 
     return render_template('index.html')
 
@@ -266,12 +273,25 @@ def payment():
     tier = request.args.get('tier')
     filename = request.args.get('filename')
     email = request.args.get('email')
-    return render_template('payment.html', tier=tier, filename=filename, email=email)
+    amount = request.args.get('amount', 0)
+    return render_template('payment.html', tier=tier, filename=filename, email=email, amount=float(amount), upi_id=RECEIVER_UPI_ID)
 
 @app.route('/send_email', methods=['POST'])
 def send_email_route():
     email = request.form.get('email')
     filename = request.form.get('filename')
+    # Transaction ID verification
+    transaction_id = request.form.get('transaction_id')
+    amount_str = request.form.get('amount')
+    
+    try:
+        amount = float(amount_str) if amount_str else 0
+    except:
+        amount = 0
+        
+    # Security Check: If amount > 0 (Paid Tier), Transaction ID is MANDATORY
+    if amount > 0 and not transaction_id:
+        return "Error: Transaction ID Missing! Please complete payment verification."
     
     # Read zip
     temp_dir = tempfile.gettempdir()
