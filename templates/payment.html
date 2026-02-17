@@ -3,46 +3,135 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Processing...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Download</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9209414663654494"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: sans-serif;
-            background: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, #11998e, #38ef7d, #00b09b, #96c93d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            text-align: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
             max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .ad-box {
-            background: #e0e0e0;
-            height: 200px;
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .price-box {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .price-large {
+            font-size: 36px;
+            color: #27ae60;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .ad-container {
+            margin: 20px 0;
+            min-height: 150px;
+            background: #f1f2f6;
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px 0;
-            border: 2px dashed #bbb;
-            color: #666;
-            font-weight: bold;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+
+        .ad-label {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 10px;
+            color: #bbb;
+            background: white;
+            padding: 2px 5px;
+            border-radius: 3px;
         }
 
         .btn {
-            background: #28a745;
+            background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
-            padding: 15px 30px;
+            padding: 15px 40px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
         }
     </style>
 </head>
@@ -50,29 +139,34 @@
 <body>
     <div class="card">
         {% if tier == 'paid' %}
-        <h2>Complete Payment</h2>
-        <p>You selected the <strong>Paid Tier</strong> (500 Images).</p>
-        <p>Rate: ₹0.50 per image</p>
-        <p>Total Amount: <strong>₹250</strong></p>
-        <div style="margin: 20px; padding: 20px; border: 1px solid #ccc; background: #fafafa;">
-            <!-- Mock Payment Form -->
-            <input type="text" placeholder="Card Number" style="padding: 10px; width: 80%; margin-bottom: 10px;"><br>
-            <input type="text" placeholder="MM/YY" style="padding: 10px; width: 30%;">
-            <input type="text" placeholder="CVC" style="padding: 10px; width: 30%;">
+        <h2>Checkout</h2>
+        <p>Unlock <strong>500 High-Res Images</strong></p>
+
+        <div class="price-box">
+            <span>Total Amount</span>
+            <span class="price-large">₹250</span>
+            <small>@ ₹0.50 / image</small>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label style="font-size: 12px; font-weight: bold; color: #555;">CARD NUMBER</label>
+            <input type="text" placeholder="0000 0000 0000 0000">
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <input type="text" placeholder="MM/YY" style="width: 50%;">
+                <input type="text" placeholder="CVC" style="width: 50%;">
+            </div>
         </div>
         {% else %}
-        <h2>Processing Free Download</h2>
-        <p>You selected the <strong>Free Tier</strong> (50 Images).</p>
+        <h2>Your Download is Ready!</h2>
+        <p>Enjoy your <strong>50 Free Images</strong></p>
         {% endif %}
 
-        <!-- Advertisement Section -->
-        <div class="ad-box">
-            <p>Advertisement</p>
-            <!-- Google AdSense Placeholder -->
-            <script async
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9209414663654494"
-                crossorigin="anonymous"></script>
-            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9209414663654494"
+        <!-- Optimized Ad Space -->
+        <div class="ad-container">
+            <span class="ad-label">Sponsored</span>
+
+            <!-- Google AdSense Code -->
+            <ins class="adsbygoogle" style="display:block; width:100%;" data-ad-client="ca-pub-9209414663654494"
                 data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
             <script>
                 (adsbygoogle = window.adsbygoogle || []).push({});
@@ -84,9 +178,9 @@
             <input type="hidden" name="filename" value="{{ filename }}">
             <button class="btn" type="submit">
                 {% if tier == 'paid' %}
-                Pay & Receive Email
+                Pay & Download
                 {% else %}
-                Receive Download Link
+                Download Now
                 {% endif %}
             </button>
         </form>

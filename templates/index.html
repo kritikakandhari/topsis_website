@@ -7,95 +7,189 @@
     <title>Topsis Image Downloader</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9209414663654494"
         crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            overflow: hidden;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 20px;
-            padding: 40px;
-            width: 400px;
+            padding: 50px;
+            width: 450px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border: 1px solid rgba(255, 255, 255, 0.18);
             text-align: center;
+            color: white;
+            position: relative;
+            z-index: 10;
         }
 
         h1 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        p {
             margin-bottom: 30px;
+            font-weight: 300;
+            opacity: 0.9;
         }
 
         input,
         select {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             margin: 10px 0;
-            border-radius: 8px;
+            border-radius: 30px;
             border: none;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             color: white;
             outline: none;
+            font-size: 16px;
+            transition: 0.3s;
+            text-align: center;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
         }
 
-        option {
-            background: #764ba2;
+        input:focus,
+        select:focus {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        select option {
+            color: black;
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             margin-top: 20px;
-            border-radius: 8px;
+            border-radius: 30px;
             border: none;
-            background: #ff7e5f;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-weight: bold;
+            font-size: 18px;
             cursor: pointer;
             transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         button:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .flash {
-            color: #ffcccb;
-            margin-bottom: 10px;
+        .loader {
+            display: none;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-1000px) rotate(360deg);
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Image Downloader</h1>
+    <!-- Floating Background Shapes -->
+    <div class="floating-circle"
+        style="width: 200px; height: 200px; left: 10%; bottom: -200px; animation-duration: 15s;"></div>
+    <div class="floating-circle"
+        style="width: 150px; height: 150px; left: 70%; bottom: -150px; animation-duration: 12s; animation-delay: 2s;">
+    </div>
+    <div class="floating-circle"
+        style="width: 300px; height: 300px; left: 40%; bottom: -300px; animation-duration: 25s; animation-delay: 5s;">
+    </div>
+
+    <div class="glass-container">
+        <h1>Topsis Image Hunter</h1>
+        <p>Curated High-Quality Images Ranked by AI</p>
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
+        <div style="color: #ffcccb; margin-bottom: 15px;">{{ messages[0] }}</div>
         {% endif %}
         {% endwith %}
 
-        <form action="/" method="POST">
-            <input type="text" name="keyword" placeholder="Enter Keyword (e.g. Nature)" required>
+        <form action="/" method="POST"
+            onsubmit="document.querySelector('.loader').style.display='block'; document.querySelector('button').style.display='none';">
+            <input type="text" name="keyword" placeholder="Search Keyword (e.g. Space)" required>
             <input type="email" name="email" placeholder="Your Email Address" required>
             <select name="tier">
                 <option value="free">Free Tier (50 Images + Ad)</option>
-                <option value="paid">Paid Tier (500 Images @ ₹0.50/img = ₹250)</option>
+                <option value="paid">Paid Tier (500 Images | ₹250 Only)</option>
             </select>
-            <button type="submit">Search & Process</button>
+            <button type="submit">Start Hunting 🚀</button>
+            <div class="loader"></div>
+            <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Wait time: ~10-20 seconds</p>
         </form>
     </div>
 </body>
