@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Processing...</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
+
+        .ad-box {
+            background: #e0e0e0;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            border: 2px dashed #bbb;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        {% if tier == 'paid' %}
+        <h2>Complete Payment</h2>
+        <p>You selected the <strong>Paid Tier</strong> (500 Images).</p>
+        <p>Rate: ₹0.50 per image</p>
+        <p>Total Amount: <strong>₹250</strong></p>
+        <div style="margin: 20px; padding: 20px; border: 1px solid #ccc; background: #fafafa;">
+            <!-- Mock Payment Form -->
+            <input type="text" placeholder="Card Number" style="padding: 10px; width: 80%; margin-bottom: 10px;"><br>
+            <input type="text" placeholder="MM/YY" style="padding: 10px; width: 30%;">
+            <input type="text" placeholder="CVC" style="padding: 10px; width: 30%;">
+        </div>
+        {% else %}
+        <h2>Processing Free Download</h2>
+        <p>You selected the <strong>Free Tier</strong> (50 Images).</p>
+        {% endif %}
+
+        <!-- Advertisement Section -->
+        <div class="ad-box">
+            <p>Advertisement</p>
+            <!-- Google AdSense Placeholder -->
+            <script async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+                crossorigin="anonymous"></script>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <form action="/send_email" method="POST">
+            <input type="hidden" name="email" value="{{ email }}">
+            <input type="hidden" name="filename" value="{{ filename }}">
+            <button class="btn" type="submit">
+                {% if tier == 'paid' %}
+                Pay & Receive Email
+                {% else %}
+                Receive Download Link
+                {% endif %}
+            </button>
+        </form>
+    </div>
+</body>
+
+</html>

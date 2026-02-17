@@ -1,0 +1,7 @@
+__pycache__/
+*.zip
+*.csv
+.DS_Store
+.env
+venv/
+static/*.zip
