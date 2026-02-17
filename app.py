@@ -15,10 +15,19 @@ from PIL import Image
 import pandas as pd
 import numpy as np
 import concurrent.futures
+import traceback
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.secret_key = 'supersecretkey'
 application = app # Alias for Vercel/WSGI
+
+@app.errorhandler(500)
+def internal_error(error):
+    # Print traceback to both server logs and the response for easy debugging
+    # We will remove this once the error is identified
+    err_msg = traceback.format_exc()
+    print(err_msg)
+    return f"<h1>500 Internal Server Error</h1><pre>{err_msg}</pre>", 500
 
 # --- Configuration ---
 # You need to fill these in to actually send email
@@ -281,14 +290,6 @@ def payment():
     except:
         amount = 0.0
     return render_template('payment.html', tier=tier, filename=filename, email=email, amount=amount, upi_id=RECEIVER_UPI_ID)
-
-@app.errorhandler(500)
-def internal_error(error):
-    return f"500 Error: {error}", 500
-
-@app.errorhandler(404)
-def not_found(error):
-    return f"404 Error: {error}", 404
 
 @app.route('/send_email', methods=['POST'])
 def send_email_route():
