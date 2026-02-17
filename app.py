@@ -115,8 +115,8 @@ def topsis_rank(data, weights=None, impacts=None):
         return []
 
     # Normalize
-    # Handle zero division if a column is all zeros
-    norm_df = df.copy()
+    # Cast to float to avoid LossySetitemError when assigning float results to int columns
+    norm_df = df.astype(float) 
     for i in range(num_cols):
         denom = np.sqrt((df.iloc[:, i]**2).sum())
         if denom == 0:
