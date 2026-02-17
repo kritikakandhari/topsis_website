@@ -297,15 +297,6 @@
             <span class="price-large">₹250</span>
             <small>@ ₹0.50 / image</small>
         </div>
-
-        <div style="text-align: left; margin-bottom: 20px;">
-            <label style="font-size: 12px; font-weight: bold; color: #555;">CARD NUMBER</label>
-            <input type="text" placeholder="0000 0000 0000 0000">
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <input type="text" placeholder="MM/YY" style="width: 50%;">
-                <input type="text" placeholder="CVC" style="width: 50%;">
-            </div>
-        </div>
         {% else %}
         <h2>Your Download is Ready!</h2>
         <p>Enjoy your <strong>50 Free Images</strong></p>
@@ -323,7 +314,22 @@
             </script>
         </div>
 
-        <form action="/send_email" method="POST">
+        <form action="/send_email" method="POST" id="payment-form">
+            {% if tier == 'paid' %}
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 12px; font-weight: bold; color: #555;">CARD NUMBER</label>
+                <input type="text" placeholder="0000 0000 0000 0000" pattern="\d{4}\s?\d{4}\s?\d{4}\s?\d{4}"
+                    title="16-digit card number" required
+                    style="width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px;">
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/\d{2}" title="MM/YY" required
+                        style="width: 50%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                    <input type="text" placeholder="CVC" pattern="\d{3,4}" title="3 or 4 digit CVC" required
+                        style="width: 50%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+            </div>
+            {% endif %}
+
             <input type="hidden" name="email" value="{{ email }}">
             <input type="hidden" name="filename" value="{{ filename }}">
             <button class="btn" type="submit">

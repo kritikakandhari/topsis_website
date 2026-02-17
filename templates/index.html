@@ -298,10 +298,27 @@
             onsubmit="document.querySelector('.loader').style.display='block'; document.querySelector('button').style.display='none';">
             <input type="text" name="keyword" placeholder="Search Keyword (e.g. Space)" required>
             <input type="email" name="email" placeholder="Your Email Address" required>
-            <select name="tier">
-                <option value="free">Free Tier (50 Images + Ad)</option>
-                <option value="paid">Paid Tier (500 Images | ₹250 Only)</option>
-            </select>
+            <!-- Custom Image Count Input with +/- -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin: 15px 0;">
+                <button type="button" onclick="adjustCount(-1)"
+                    style="width: 40px; height: 40px; padding: 0; margin: 0; border-radius: 50%; display:flex; align-items:center; justify-content:center;">-</button>
+                <input type="number" id="image_count" name="image_count" value="10" min="1" max="500"
+                    style="width: 80px; text-align: center; margin: 0;">
+                <button type="button" onclick="adjustCount(1)"
+                    style="width: 40px; height: 40px; padding: 0; margin: 0; border-radius: 50%; display:flex; align-items:center; justify-content:center;">+</button>
+            </div>
+            <p style="font-size: 12px; opacity: 0.8; margin-top: -5px;">Enter number of images (Max 500)</p>
+
+            <script>
+                function adjustCount(amount) {
+                    const input = document.getElementById('image_count');
+                    let val = parseInt(input.value) || 0;
+                    val += amount;
+                    if (val < 1) val = 1;
+                    if (val > 500) val = 500;
+                    input.value = val;
+                }
+            </script>
             <button type="submit">Start Hunting 🚀</button>
             <div class="loader"></div>
             <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">Wait time: ~10-20 seconds</p>

@@ -78,15 +78,39 @@ def download_and_analyze(url):
         pass
     return None, 0, 0, 0
 
-def topsis_rank(data, weights=[1,1,1], impacts=['+','+','+']):
+def topsis_rank(data, weights=None, impacts=None):
     """
-    Ranks images based on [Width, Height, Size].
+    Ranks items based on provided data matrix.
+    data: list of lists (numerical values)
+    weights: list of weights (default: equal weights)
+    impacts: list of '+' or '-' strings
     Returns indices of sorted items (best first).
     """
-    df = pd.DataFrame(data, columns=['Width', 'Height', 'Size'])
+    if not data:
+        return []
+        
+    df = pd.DataFrame(data)
+    num_cols = df.shape[1]
     
+    if weights is None:
+        weights = [1] * num_cols
+    if impacts is None:
+        impacts = ['+'] * num_cols
+        
+    # Check dimensions
+    if len(weights) != num_cols or len(impacts) != num_cols:
+        print("Error: Weights/Impacts length mismatch")
+        return []
+
     # Normalize
-    norm_df = df / np.sqrt((df**2).sum())
+    # Handle zero division if a column is all zeros
+    norm_df = df.copy()
+    for i in range(num_cols):
+        denom = np.sqrt((df.iloc[:, i]**2).sum())
+        if denom == 0:
+            norm_df.iloc[:, i] = 0
+        else:
+            norm_df.iloc[:, i] = df.iloc[:, i] / denom
     
     # Weighted
     weighted_df = norm_df * weights
@@ -95,7 +119,7 @@ def topsis_rank(data, weights=[1,1,1], impacts=['+','+','+']):
     ideal_best = []
     ideal_worst = []
     
-    for i, col in enumerate(df.columns):
+    for i in range(num_cols):
         if impacts[i] == '+':
             ideal_best.append(weighted_df.iloc[:, i].max())
             ideal_worst.append(weighted_df.iloc[:, i].min())
@@ -108,7 +132,8 @@ def topsis_rank(data, weights=[1,1,1], impacts=['+','+','+']):
     s_minus = np.sqrt(((weighted_df - ideal_worst)**2).sum(axis=1))
     
     # Score
-    scores = s_minus / (s_plus + s_minus)
+    # Handle division by zero if s_plus + s_minus is 0
+    scores = s_minus / (s_plus + s_minus + 1e-9)
     
     # Return indices sorted by score descending
     return scores.sort_values(ascending=False).index.tolist()
@@ -152,27 +177,41 @@ def index():
     if request.method == 'POST':
         keyword = request.form.get('keyword')
         email = request.form.get('email')
-        tier = request.form.get('tier') # 'free' or 'paid'
         
-        # Scrape count based on tier
-        limit = 500 if tier == 'paid' else 50
-        # Wait... user said 50 for free, 500 for paid.
-        # But for assignment speed/demo, we'll keep it smaller, 
-        # OR we can simulate "finding" 1000 and "returning" 50.
+        # Get custom image count
+        try:
+            image_count = int(request.form.get('image_count'))
+        except:
+            image_count = 10 # Default fallback
+            
+        # Determine tier based on count
+        # If > 50, it's paid. Else free.
+        tier = 'paid' if image_count > 50 else 'free'
         
-        # Store in session or process immediately? 
-        # Processing takes time. We'll do it synchronously for simplicity.
+        # Limit for scraping (scrape a bit more to have variety for Topsis)
+        scrape_limit = image_count + 10 
+        
+        # Vercel Timeout Warning: 
+        # If user asks for 500, it might timeout on free Vercel.
+        # But we must respect user request. threading helps.
         
         # 1. Scrape URLs
-        urls = scrape_images_duckduckgo(keyword, max_images=limit)
+        urls = scrape_images_duckduckgo(keyword, max_images=scrape_limit)
         
-        # 2. Download & Analyze
+        # 2. Download & Analyze (Parallel Processing)
         image_data = [] # [Width, Height, Size]
-        valid_images = [] # (content, extension)
+        valid_images = [] # (content)
         
-        print("Downloading and Analyzing...")
-        for url in urls:
-            content, w, h, s = download_and_analyze(url)
+        import concurrent.futures
+        
+        def process_url(url):
+            return download_and_analyze(url)
+
+        print(f"Downloading {len(urls)} images...")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            results = list(executor.map(process_url, urls))
+            
+        for content, w, h, s in results:
             if content:
                 image_data.append([w, h, s])
                 valid_images.append(content)
@@ -182,11 +221,18 @@ def index():
             return redirect(url_for('index'))
 
         # 3. Topsis Rank
-        # Criteria: Width, Height, Size. Weights: 1,1,1. Impacts: +,+,+
-        ranked_indices = topsis_rank(image_data)
+        # Criteria: Resolution (Width * Height), Size. 
+        # User Request: "plus minus sign" -> Resolution+, Size-
+        # Prepare data for new criteria
+        topsis_data = []
+        for w, h, s in image_data:
+            resolution = w * h
+            topsis_data.append([resolution, s])
+            
+        ranked_indices = topsis_rank(topsis_data, weights=[1,1], impacts=['+','-'])
         
         # 4. Filter Top N
-        top_n = 50 if tier == 'free' else 500
+        top_n = image_count 
         top_n = min(len(valid_images), top_n) # Adjust if we found fewer
         
         selected_indices = ranked_indices[:top_n]
