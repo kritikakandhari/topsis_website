@@ -20,8 +20,9 @@ app.secret_key = 'supersecretkey'
 
 # --- Configuration ---
 # You need to fill these in to actually send email
-SENDER_EMAIL = "guddukandhari19@gmail.com" 
-SENDER_PASSWORD = "bpge jpnx punv dkdg"
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "kkandhari_be23@thapar.edu")
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "rnqw okhn khvg gwiq")
+
 
 # --- Helper Functions ---
 
